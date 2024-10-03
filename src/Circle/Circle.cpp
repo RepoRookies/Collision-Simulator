@@ -2,11 +2,8 @@
 
 #include <cmath>
 #include <utility>
+#include <algorithm>
 #include <raylib.h>
-
-#define WIDTH GetScreenWidth()
-#define HEIGHT GetScreenHeight()
-#define RESTITUTION 0.9
 
 void Circle::init() {
 	// Initialization Code Here...
@@ -16,7 +13,7 @@ void Circle::update(f32 delta) {
 	// Initialization Code Here...
 	handleGravity(HEIGHT);
 	moveCircle(delta);
-	handleWindowBounds(WIDTH, HEIGHT, RESTITUTION);
+	handleWindowBounds();
 }
 
 void Circle::drawGfx() {
@@ -27,18 +24,6 @@ void Circle::drawGfx() {
 Circle::Circle(Vec2D center, double radius, Vec2D velocity, double gravity, Color color) : 
 	center(center), radius(radius), velocity(velocity), gravity(gravity), color(color) 
 {};
-
-// Gravity Manipulation
-void Circle::handleGravity(int limit) {
-	gravity = (center.y_comp + radius < limit) ? 500 * GetFrameTime() : 0;
-	velocity.incVec2D(0, gravity);
-}
-
-// Move Circle Implementation
-void Circle::moveCircle(f32 delta) {
-	center.x_comp += velocity.x_comp * GetFrameTime();
-	center.y_comp += velocity.y_comp * GetFrameTime();
-}
 
 // Collision Function Implementations...
 double Circle::getCenterDistance(const Circle& first, const Circle& second) {
@@ -74,15 +59,6 @@ std::pair <Vec2D, Vec2D> Circle::getIdealCenters(const Circle& first, const Circ
 
 	Vec2D first_center(first.center.x_comp + offset * unit_vec2.x_comp, first.center.y_comp + offset * unit_vec2.y_comp);
 	Vec2D second_center(second.center.x_comp - offset * unit_vec2.x_comp, second.center.y_comp - offset * unit_vec2.y_comp);
-	
-	if (first_center.x_comp - first.radius < 0) first_center.x_comp = first.radius;
-	if (first_center.y_comp - first.radius < 0) first_center.y_comp = first.radius;
-
-	if (first_center.x_comp + first.radius >= WIDTH) first_center.x_comp = WIDTH - first.radius;
-	if (first_center.y_comp + first.radius >= HEIGHT) first_center.y_comp = HEIGHT - first.radius;
-
-	if (second_center.x_comp - second.radius < 0) second_center.x_comp = second.radius;
-	if (second_center.y_comp - second.radius < 0) second_center.y_comp = second.radius;
 
 	return { first_center, second_center };
 }
@@ -95,27 +71,42 @@ void Circle::setPostCollision(Circle& first,Circle& second) {
 }
 
 // Window Bounds Implementation
-void Circle::handleWindowBounds(int window_width, int window_height, double restitution) {
-	if (0 >= center.x_comp - radius || center.x_comp + radius >= window_width) {
-		velocity.x_comp *= -restitution;
+void Circle::handleWindowBounds() {
+	if (0 >= center.x_comp - radius) {
+		center.x_comp = radius;
+		velocity.x_comp *= -RESTITUTION;
+	} else if (center.x_comp + radius >= WIDTH) {
+		center.x_comp = WIDTH - radius;
+		velocity.x_comp *= -RESTITUTION;
 	}
-	if (0 >= center.y_comp - radius || center.y_comp + radius >= window_height) {
-		velocity.y_comp *= -restitution;
+	if (0 >= center.y_comp - radius) {
+		center.y_comp = radius;
+		velocity.y_comp *= -RESTITUTION;
+	} else if (center.y_comp + radius >= HEIGHT) {
+		center.y_comp = HEIGHT - radius;
+		velocity.y_comp *= -RESTITUTION;
 	}
 }
 
 // Overall Collision Handler Implementation
-void Circle::handleCollision(Circle& first, Circle& second, int window_width, int window_height, double restitution) {
+void Circle::handleCollision(Circle& first, Circle& second) {
 	bool collision = Circle::isCollision(first, second);
 	first.color = second.color = collision ? RED : GREEN;
 
 	if (collision) {
+		first.handleWindowBounds();
+		second.handleWindowBounds();
+
+		TraceLog(LOG_INFO, "*** CHUD GAYE GURU ***\n");
 		Circle::setPostCollision(first, second);
 
 		auto unit_vec2 = Circle::getAxisVec2(first, second);
 		auto relative_velocity_scalar = (first.velocity - second.velocity) * unit_vec2;
 
 		first.velocity.incVec2D(unit_vec2.multiplyScalar(-(relative_velocity_scalar)));
-		first.velocity.incVec2D(unit_vec2.multiplyScalar(relative_velocity_scalar));
+		second.velocity.incVec2D(unit_vec2.multiplyScalar(relative_velocity_scalar));
+
+		first.handleWindowBounds();
+		second.handleWindowBounds();
 	}
 }

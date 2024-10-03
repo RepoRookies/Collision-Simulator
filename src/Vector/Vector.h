@@ -2,34 +2,27 @@
 
 class Vec2D {
 public:
-    // Components of 2D Vector
-    double x_comp, y_comp;
-
-    // Vector Constructor
-    Vec2D(double x = 0, double y = 0);
+    double x_comp, y_comp;  // Components of 2D Vector
+    
+    Vec2D(double x = 0, double y = 0);  // Vector Constructor
 
     // Increment Vector Components
-    void incVec2D(double x, double y);
-    void incVec2D(const Vec2D& vector);
+    inline void incVec2D(double x, double y) {
+        x_comp += x;
+        y_comp += y;
+    }
+    inline void incVec2D(const Vec2D& vector) {
+        x_comp += vector.x_comp;
+        y_comp += vector.y_comp;
+    }
 
-    // Scalar multiplication
-    Vec2D multiplyScalar(double scalar);
+    Vec2D multiplyScalar(double scalar);    // Scalar Multiplication
 
-    // Vector Addition
-    Vec2D operator+(const Vec2D& other);
+    Vec2D operator+(const Vec2D& other);    // Vector Addition
+    Vec2D operator-(const Vec2D& other);    // Vector Subtraction
+    double operator*(const Vec2D& other);   // Dot Product
+    double operator%(const Vec2D& other);   // Cross Product
 
-    // Vector Subtraction
-    Vec2D operator-(const Vec2D& other);
-
-    // Dot Product
-    double operator*(const Vec2D& other);
-
-    // Cross Product
-    double operator%(const Vec2D& other);
-
-    // Magnitude
-    double magnitude() const;
-
-    // Normalization or Make Unit Vector
-    Vec2D normalize() const;
+    double magnitude() const;   // Magnitude
+    Vec2D normalize() const;    // Normalization or Make Unit Vector
 };

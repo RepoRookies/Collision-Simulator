@@ -1,9 +1,14 @@
 #pragma once
 
+#include "../Core/drawable.hpp"
 #include "../Vector/Vector.h"
 #include <raylib.h>
 #include <utility>
-#include "../Core/drawable.hpp"
+
+#define RADIUS 10
+#define WIDTH GetScreenWidth()
+#define HEIGHT GetScreenHeight()
+#define RESTITUTION 0.75
 
 class Circle : Core::Drawable {
 public:
@@ -18,35 +23,32 @@ public:
 	Color color;		// Circle Color
 
 	// Circle Constructor
-	Circle(Vec2D center = Vec2D(0, 0), double radius = 100, Vec2D velocity = Vec2D(0, 0), double gravity = 0, Color color = GREEN);
+	Circle(
+		Vec2D center = Vec2D(WIDTH / 2, HEIGHT / 2),
+		double radius = RADIUS,
+		Vec2D velocity = Vec2D(0, 0),
+		double gravity = 0, 
+		Color color = GREEN
+	);
 
-	// Gravity Manipulation
-	void handleGravity(int limit);
+	inline void handleGravity(int limit) {
+		gravity = (center.y_comp + radius < limit) ? 500 * GetFrameTime() : 0;
+		velocity.incVec2D(0, gravity);
+	}
+	inline void moveCircle(f32 delta) {
+		center.x_comp += velocity.x_comp * GetFrameTime();
+		center.y_comp += velocity.y_comp * GetFrameTime();
+	}
 
-	// Move Circle using Velocity Vector
-	void moveCircle(f32 delta);
+	void handleWindowBounds();
 
-	// Distance between Centers of 2 Circles
 	static double getCenterDistance(const Circle& first, const Circle& second);
-
-	// Overlapping Distance between 2 Circles
 	static double getOverlapDistance(const Circle& first, const Circle& second);
-	
-	// Check for Collision Between 2 Circles
 	static bool isCollision(const Circle& first, const Circle& second);
 
-	// Get Unit Vector (Axis of Collision)
 	static Vec2D getAxisVec2(const Circle& first, const Circle& second);
-
-	// Ideal Centers Post Collision
 	static std::pair <Vec2D, Vec2D> getIdealCenters(const Circle& first, const Circle& second);
-
-	// Center Updates Post Collision
 	static void setPostCollision(Circle& first, Circle& second);
 
-	// Check & Handle Window Bounds
-	void handleWindowBounds(int window_width, int window_height, double restitution = 1);
-
-	// Handles Overall Collision between 2 Circles
-	static void handleCollision(Circle& first, Circle& second, int window_width, int window_height, double restitution = 1);
+	static void handleCollision(Circle& first, Circle& second);
 };

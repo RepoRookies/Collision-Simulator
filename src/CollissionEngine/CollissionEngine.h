@@ -2,6 +2,8 @@
 #include <vector>
 #include "../Circle/Circle.h"
 
+#define COLLISION_CLOCK_RATE 8
+
 /**
 * Collission Engine Class
 * Collission Engine does not create or destroy collider
@@ -14,30 +16,28 @@ namespace Core {
 		HASH_PARALLEL
 	};
 }
-class CollissionEngine
-{
+
+class CollissionEngine {
 private:
-	static std::vector<Circle> circles;
+	static std::vector <Circle> circles;
 	static void simulate_no_hash();
 	static void simulate_hash();
 	static void simulate_hash_parallel();
-
-protected:
-
+	
 public:
 	static void init();
 	inline static void Simulate(Core::SimType sim_type) {
-		switch (sim_type)
-		{
-		case Core::SimType::NO_HASH:
-			simulate_no_hash();
-			return;
-		case Core::SimType::HASH:
-			simulate_hash();
-			return;
-		case Core::SimType::HASH_PARALLEL:
-			simulate_hash_parallel();
-			return;
+		switch (sim_type) {
+			case Core::SimType::NO_HASH: {
+				simulate_no_hash();
+				return;
+			} case Core::SimType::HASH: {
+				simulate_hash();
+				return;
+			} case Core::SimType::HASH_PARALLEL: {
+				simulate_hash_parallel();
+				return;
+			}
 		}
 	}
 
@@ -49,5 +49,3 @@ public:
 		return circles;
 	}
 };
-
-
