@@ -4,6 +4,25 @@
 #include <utility>
 #include <raylib.h>
 
+#define WIDTH GetScreenWidth()
+#define HEIGHT GetScreenHeight()
+#define RESTITUTION 0.9
+
+void Circle::init() {
+	// Initialization Code Here...
+}
+
+void Circle::update(f32 delta) {
+	// Initialization Code Here...
+	handleGravity(HEIGHT);
+	moveCircle(delta);
+	handleWindowBounds(WIDTH, HEIGHT, RESTITUTION);
+}
+
+void Circle::drawGfx() {
+	DrawCircle(center.x_comp, center.y_comp, radius, color);
+}
+
 // Constructors Implementation
 Circle::Circle(Vec2D center, double radius, Vec2D velocity, double gravity, Color color) : 
 	center(center), radius(radius), velocity(velocity), gravity(gravity), color(color) 
@@ -16,7 +35,7 @@ void Circle::handleGravity(int limit) {
 }
 
 // Move Circle Implementation
-void Circle::moveCircle() {
+void Circle::moveCircle(f32 delta) {
 	center.x_comp += velocity.x_comp * GetFrameTime();
 	center.y_comp += velocity.y_comp * GetFrameTime();
 }
@@ -47,6 +66,7 @@ Vec2D Circle::getAxisVec2(const Circle& first, const Circle& second) {
 }
 
 // Get Ideal Centers Post Collision
+// Ideal -> Centers of Circles Post Collision
 std::pair <Vec2D, Vec2D> Circle::getIdealCenters(const Circle& first, const Circle& second) {
 	double offset = Circle::getOverlapDistance(first, second) / 2;
 
@@ -54,6 +74,15 @@ std::pair <Vec2D, Vec2D> Circle::getIdealCenters(const Circle& first, const Circ
 
 	Vec2D first_center(first.center.x_comp + offset * unit_vec2.x_comp, first.center.y_comp + offset * unit_vec2.y_comp);
 	Vec2D second_center(second.center.x_comp - offset * unit_vec2.x_comp, second.center.y_comp - offset * unit_vec2.y_comp);
+	
+	if (first_center.x_comp - first.radius < 0) first_center.x_comp = first.radius;
+	if (first_center.y_comp - first.radius < 0) first_center.y_comp = first.radius;
+
+	if (first_center.x_comp + first.radius >= WIDTH) first_center.x_comp = WIDTH - first.radius;
+	if (first_center.y_comp + first.radius >= HEIGHT) first_center.y_comp = HEIGHT - first.radius;
+
+	if (second_center.x_comp - second.radius < 0) second_center.x_comp = second.radius;
+	if (second_center.y_comp - second.radius < 0) second_center.y_comp = second.radius;
 
 	return { first_center, second_center };
 }

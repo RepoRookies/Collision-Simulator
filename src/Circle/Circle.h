@@ -1,11 +1,16 @@
 #pragma once
 
-#include "../../src/Vector/Vector.h"
+#include "../Vector/Vector.h"
 #include <raylib.h>
 #include <utility>
+#include "../Core/drawable.hpp"
 
-class Circle {
+class Circle : Core::Drawable {
 public:
+	void init() override;
+	void update(f32 delta) override;
+	void drawGfx() override;
+
 	double radius;		// Radius
 	Vec2D center;		// Center (x, y) Coordinates
 	Vec2D velocity;		// 2D Velocity Vector
@@ -13,13 +18,13 @@ public:
 	Color color;		// Circle Color
 
 	// Circle Constructor
-	Circle(Vec2D center = Vec2D(0, 0), double radius = 100, Vec2D velocity = Vec2D(0, 0), double gravity = 500 * GetFrameTime(), Color color = GREEN);
+	Circle(Vec2D center = Vec2D(0, 0), double radius = 100, Vec2D velocity = Vec2D(0, 0), double gravity = 0, Color color = GREEN);
 
 	// Gravity Manipulation
 	void handleGravity(int limit);
 
 	// Move Circle using Velocity Vector
-	void moveCircle();
+	void moveCircle(f32 delta);
 
 	// Distance between Centers of 2 Circles
 	static double getCenterDistance(const Circle& first, const Circle& second);

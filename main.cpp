@@ -1,6 +1,7 @@
 #include <raylib.h>
 
 #include "src/Circle/Circle.h"
+#include "src/CollissionEngine/CollissionEngine.h"
 #include <vector>
 
 int main() {
@@ -8,7 +9,7 @@ int main() {
     const int window_width = 800;
     const int window_height = 600;
 
-    const int nof_circles = 1;
+    const int nof_circles = 5;
     const double restitution = 0.9;
 
     const int radius = 50;
@@ -24,15 +25,13 @@ int main() {
         500 * GetFrameTime()
     };
 
-    std::vector <Vec2D> init_velocity = {
-        Vec2D(0, 100),
-        Vec2D(-5, 10)
-    };
+    //std::vector <Vec2D> init_velocity = {
+    //    Vec2D(0, 100),
+    //    Vec2D(-5, 10)
+    //};
 
-    std::vector <Circle> circles;
-    for (int i = 0; i < nof_circles; i++) {
-        circles.push_back(Circle(centers[i], radius, init_velocity[i]));
-    }
+    CollissionEngine::init();
+
 
     // Initialize the Window
     InitWindow(window_width, window_height, "DEEZ NUTS");
@@ -41,33 +40,32 @@ int main() {
     SetTargetFPS(60);
 
     while (!WindowShouldClose()) { 
-        for (auto& circle : circles) {
-            circle.handleGravity(window_height);
-        }
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+			vec2 mouse(GetMousePosition());
+			CollissionEngine::addCircle(Circle(Vec2D(mouse.x,mouse.y), radius, Vec2D(1, 0)));
+        }
         // Draw Circles
-        for (auto& circle : circles) {
-            DrawCircle(circle.center.x_comp, circle.center.y_comp, circle.radius, circle.color);
+        for (auto& circle : CollissionEngine::getCircles()) {
+            circle.drawGfx();
         }
 
-        // Overall Collision Handler
-        if (circles.size() > 1) {
-            Circle::handleCollision(circles[1], circles[0], window_width, window_height, restitution);
+        //Overall Collision Handler
+        if (CollissionEngine::getCircles().size() > 1) {
+            Circle::handleCollision(CollissionEngine::getCircles()[1], CollissionEngine::getCircles()[0], window_width, window_height, restitution);
         }
+		//CollissionEngine::Simulate(Core::SimType::NO_HASH);
 
-        // Movement and other Important Updates
-        for (auto& circle : circles) {
-            circle.moveCircle();
-            circle.handleWindowBounds(window_width, window_height, restitution);
-        }
-
-        // Draw other shapes or text here if needed
+             // Draw other shapes or text here if needed
         DrawText("Press ESC to close", 10, 10, 20, DARKGRAY);
 
         EndDrawing(); // End drawing
+        for (auto& circle : CollissionEngine::getCircles()) {
+            circle.update(GetFrameTime());
+        }
     }
 
     // Close the window and OpenGL context

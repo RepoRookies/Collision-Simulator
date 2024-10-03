@@ -19,12 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\CollissionEngine\CollissionEngine.cpp" />
     <ClCompile Include="src\Circle\Circle.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\utilities\data_types.cpp" />
     <ClCompile Include="src\Vector\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\CollissionEngine\CollissionEngine.h" />
     <ClInclude Include="src\Circle\Circle.h" />
+    <ClInclude Include="src\Core\drawable.hpp" />
+    <ClInclude Include="src\Core\entity.hpp" />
+    <ClInclude Include="src\utilities\data_types.hpp" />
     <ClInclude Include="src\Vector\Vector.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
