@@ -4,9 +4,15 @@
 TestCase* TestCase::curr_test_case = nullptr;
 
 
+TestCase* TestCase::SetRadius(float radius)
+{
+	CollissionEngine::resizeBall(radius);
+	radius = radius;
+	return this;
+}
+
 void TestCase::SetCurrTestCase(TestCase* test_case)
 {
 	CollissionEngine::getCircles().clear();
-	//CollissionEngine::resizeBall();
 	curr_test_case = test_case;
 }

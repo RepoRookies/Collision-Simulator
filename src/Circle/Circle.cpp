@@ -9,7 +9,7 @@
 // Static Texture2D Initialization
 Texture2D Circle::circle_texture;
 bool Circle::texture_loaded = false;
-float Circle::imageRescaleFactor = 2.9;
+float Circle::imageRescaleFactor = 1.5;
 
 void Circle::init() {
 	// Initialization Code Here...

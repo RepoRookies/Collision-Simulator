@@ -26,6 +26,7 @@ private:
 	
 public:
 	static void load();
+	static void resizeBall();
 	static void unload();
 	inline static void Simulate(Core::SimType sim_type) {
 		switch (sim_type) {

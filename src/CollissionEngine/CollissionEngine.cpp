@@ -1,4 +1,5 @@
 #include "CollissionEngine.h"
+#include "../TestCases/TestCase.h"
 
 std::vector <Circle> CollissionEngine::circles;
 
@@ -8,6 +9,19 @@ void CollissionEngine::load() {
 		&image,
 		image.width / Circle::imageRescaleFactor,
 		image.height / Circle::imageRescaleFactor
+	);
+	Circle::circle_texture = LoadTextureFromImage(image);
+	UnloadImage(image);
+}
+
+void CollissionEngine::resizeBall()
+{
+	Image image = LoadImage("assets/Circle.png");
+	TraceLog(LOG_INFO, "Ball Radius : %f");
+	ImageResize(
+		&image,
+		image.width * (TestCase::GetRadius()/10) / Circle::imageRescaleFactor,
+		image.height * (TestCase::GetRadius()/10) / Circle::imageRescaleFactor
 	);
 	Circle::circle_texture = LoadTextureFromImage(image);
 	UnloadImage(image);
