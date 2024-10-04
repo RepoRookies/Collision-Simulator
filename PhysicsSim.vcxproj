@@ -24,6 +24,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\utilities\data_types.cpp" />
     <ClCompile Include="src\Vector\Vector.cpp" />
+    <ClCompile Include="src\TestCases\TestCase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CollissionEngine\CollissionEngine.h" />
@@ -32,6 +33,11 @@
     <ClInclude Include="src\Core\entity.hpp" />
     <ClInclude Include="src\utilities\data_types.hpp" />
     <ClInclude Include="src\Vector\Vector.h" />
+    <ClInclude Include="src\TestCases\TestCase.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\Circle.png" />
+    <Image Include="assets\Window.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

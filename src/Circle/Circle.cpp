@@ -4,6 +4,12 @@
 #include <utility>
 #include <algorithm>
 #include <raylib.h>
+#include <direct.h>
+
+// Static Texture2D Initialization
+Texture2D Circle::circle_texture;
+bool Circle::texture_loaded = false;
+float Circle::imageRescaleFactor = 2.9;
 
 void Circle::init() {
 	// Initialization Code Here...
@@ -17,13 +23,19 @@ void Circle::update(f32 delta) {
 }
 
 void Circle::drawGfx() {
-	DrawCircle(center.x_comp, center.y_comp, radius, color);
+	if (circle_texture.width == 0 || circle_texture.height == 0) {
+		//TraceLog(LOG_ERROR, "Texture loading failed!");
+	}
+	DrawTexture(circle_texture, center.x_comp - circle_texture.width/2,center.y_comp - circle_texture.height/2,color);
+	//For Debug Purposes
+	//DrawCircleLines(center.x_comp, center.y_comp, radius, color);
 }
 
 // Constructors Implementation
 Circle::Circle(Vec2D center, double radius, Vec2D velocity, double gravity, Color color) : 
-	center(center), radius(radius), velocity(velocity), gravity(gravity), color(color) 
+	center(center), radius(radius), velocity(velocity), gravity(gravity), color(color)
 {};
+
 
 // Collision Function Implementations...
 double Circle::getCenterDistance(const Circle& first, const Circle& second) {
@@ -97,7 +109,6 @@ void Circle::handleCollision(Circle& first, Circle& second) {
 		first.handleWindowBounds();
 		second.handleWindowBounds();
 
-		TraceLog(LOG_INFO, "*** CHUD GAYE GURU ***\n");
 		Circle::setPostCollision(first, second);
 
 		auto unit_vec2 = Circle::getAxisVec2(first, second);

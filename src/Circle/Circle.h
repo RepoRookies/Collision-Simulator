@@ -2,16 +2,21 @@
 
 #include "../Core/drawable.hpp"
 #include "../Vector/Vector.h"
+#include "../TestCases/TestCase.h"
 #include <raylib.h>
 #include <utility>
 
-#define RADIUS 10
+#define RADIUS  TestCase::GetRadius()
 #define WIDTH GetScreenWidth()
 #define HEIGHT GetScreenHeight()
-#define RESTITUTION 0.75
+#define RESTITUTION TestCase::GetRestitution()
 
 class Circle : Core::Drawable {
+private:
+	static bool texture_loaded;
 public:
+	static Texture2D circle_texture;
+	static float imageRescaleFactor;
 	void init() override;
 	void update(f32 delta) override;
 	void drawGfx() override;
@@ -32,7 +37,7 @@ public:
 	);
 
 	inline void handleGravity(int limit) {
-		gravity = (center.y_comp + radius < limit) ? 500 * GetFrameTime() : 0;
+		gravity = (center.y_comp + radius < limit) ? TestCase::GetGravity() : 0;
 		velocity.incVec2D(0, gravity);
 	}
 	inline void moveCircle(f32 delta) {

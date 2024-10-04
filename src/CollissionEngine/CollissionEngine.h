@@ -25,7 +25,8 @@ private:
 	static void simulate_hash_parallel();
 	
 public:
-	static void init();
+	static void load();
+	static void unload();
 	inline static void Simulate(Core::SimType sim_type) {
 		switch (sim_type) {
 			case Core::SimType::NO_HASH: {

@@ -2,7 +2,15 @@
 
 std::vector <Circle> CollissionEngine::circles;
 
-void CollissionEngine::init() {
+void CollissionEngine::load() {
+	Image image = LoadImage("assets/Circle.png");
+	ImageResize(
+		&image,
+		image.width / Circle::imageRescaleFactor,
+		image.height / Circle::imageRescaleFactor
+	);
+	Circle::circle_texture = LoadTextureFromImage(image);
+	UnloadImage(image);
 }
 
 void CollissionEngine::simulate_no_hash() {
@@ -22,5 +30,10 @@ void CollissionEngine::simulate_hash() {
 }
 
 void CollissionEngine::simulate_hash_parallel() {
+}
+
+void CollissionEngine::unload()
+{
+	UnloadTexture(Circle::circle_texture);
 }
 
