@@ -6,7 +6,7 @@
 #include <raylib.h>
 #include <utility>
 
-#define RADIUS  TestCase::GetRadius()
+#define RADIUS TestCase::GetRadius()
 #define WIDTH GetScreenWidth()
 #define HEIGHT GetScreenHeight()
 #define RESTITUTION TestCase::GetRestitution()
@@ -38,7 +38,7 @@ public:
 
 	inline void handleGravity(int limit) {
 		gravity = (center.y_comp + radius < limit) ? TestCase::GetGravity() : 0;
-		velocity.incVec2D(0, gravity);
+		velocity.incVec2D(0, gravity * GetFrameTime());
 	}
 	inline void moveCircle(f32 delta) {
 		center.x_comp += velocity.x_comp * GetFrameTime();
