@@ -9,6 +9,7 @@ private:
 
 	/********* Private Variables *********/
 	bool is_spacialHash = false;
+	bool is_parallel = false;
 	float restitution = .9;
 	float gravity = 5;
 	float radius = 20;
@@ -60,6 +61,12 @@ public:
 		}
 		return curr_test_case->is_spacialHash;
 	}
+	inline static bool IsParallel() {
+		if (curr_test_case == nullptr) {
+			return false;
+		}
+		return curr_test_case->is_parallel;
+	}
 
 	/********* Builder Functions *********/
 	inline TestCase* SetRestitution(float restitution) {
@@ -88,6 +95,10 @@ public:
 	}
 	inline TestCase* SetIsSpacialHash(bool spacialHash) {
 		this->is_spacialHash = spacialHash;
+		return this;
+	}
+	inline TestCase* SetIsParallel(bool parallel) {
+		this->is_parallel = parallel;
 		return this;
 	}
 

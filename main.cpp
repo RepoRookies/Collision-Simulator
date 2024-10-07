@@ -12,7 +12,7 @@ int main() {
     const int window_width = 800;
     const int window_height = 600;
 
-    const float spray_wait = .1f;
+    const float spray_wait = .02f;
 	float time = 0;
 
     InitWindow(window_width, window_height, "Collision-Simulator by Team Processor Heaters");
@@ -27,6 +27,7 @@ int main() {
         ->SetGravity(1000)
         ->SetBallVelocity(Vec2D(0, 0))
         ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
+        ->SetRadius(40)
         ->SetIsSpacialHash(true);
 
     TestCase* test_case2
@@ -39,12 +40,14 @@ int main() {
 
     TestCase* test_case3
         = (new TestCase())
-        ->SetNumBalls(300)
+        ->SetNumBalls(1000)
         ->SetRestitution(.9)
         ->SetGravity(1000)
         ->SetBallVelocity(Vec2D(100, 0))
+        ->SetRadius(10)
         ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
-        ->SetIsSpacialHash(true);
+        ->SetIsSpacialHash(true)
+        ->SetIsParallel(true);
 
 	TestCase::SetCurrTestCase(test_case1);
 
@@ -72,8 +75,13 @@ int main() {
         }
 
         //Overall Collision Handler
-        if(TestCase::IsSpacialHash())
-			CollissionEngine::Simulate(Core::SimType::HASH);
+        if (TestCase::IsSpacialHash())
+        {
+            if (!TestCase::IsParallel())
+                CollissionEngine::Simulate(Core::SimType::HASH);
+            else
+				CollissionEngine::Simulate(Core::SimType::HASH_PARALLEL);
+        }
         else
 			CollissionEngine::Simulate(Core::SimType::NO_HASH);
 

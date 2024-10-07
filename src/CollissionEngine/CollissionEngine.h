@@ -35,6 +35,7 @@ private:
 	static std::vector<std::vector<std::vector<i32>>> colliders_per_cell;
 	static std::vector<std::vector<i32>> num_colliders_per_cell;
 	static void SolveCollissionsHash();
+	static void SolveCollissionsHashParallel();
 	static void SolveCollissionsForCellHash(i32 x, i32 y);
 	static inline Vec2D GetColIndicesFloor(Vec2D col_pos) {
 		return  Vec2D(floor(col_pos.x_comp / (2*RADIUS)),

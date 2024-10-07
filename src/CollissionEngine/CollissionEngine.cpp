@@ -1,5 +1,6 @@
 #include "CollissionEngine.h"
 #include "../TestCases/TestCase.h"
+#include <omp.h>
 
 std::vector <Circle> CollissionEngine::circles;
 std::vector<std::vector<std::vector<i32>>> CollissionEngine::colliders_per_cell;
@@ -100,17 +101,36 @@ void CollissionEngine::GenerateSpatialGrid()
 
 
 void CollissionEngine::simulate_hash() {
-	GenerateSpatialGrid();
-	SolveCollissionsHash();
+	for (size_t i = 0; i < COLLISION_CLOCK_RATE; i++) {
+		GenerateSpatialGrid();
+		SolveCollissionsHash();
+	}
 }
 
 void CollissionEngine::simulate_hash_parallel() {
+
+	for (size_t i = 0; i < COLLISION_CLOCK_RATE; i++) {
+		GenerateSpatialGrid();
+		SolveCollissionsHashParallel();
+	}
 }
 
 void CollissionEngine::SolveCollissionsHash()
 {
 	if (!is_initialized)
 		return;
+	for (i32 x = 0; x < cellsX; x++) {
+		for (i32 y = 0; y < cellsY; y++) {
+			SolveCollissionsForCellHash(x, y);
+		}
+	}
+}
+
+void CollissionEngine::SolveCollissionsHashParallel()
+{
+	if (!is_initialized)
+		return;
+#pragma omp parallel for collapse(2) 
 	for (i32 x = 0; x < cellsX; x++) {
 		for (i32 y = 0; y < cellsY; y++) {
 			SolveCollissionsForCellHash(x, y);

@@ -26,7 +26,8 @@ void Circle::drawGfx() {
 	if (circle_texture.width == 0 || circle_texture.height == 0) {
 		//TraceLog(LOG_ERROR, "Texture loading failed!");
 	}
-	DrawTexture(circle_texture, center.x_comp - circle_texture.width/2,center.y_comp - circle_texture.height/2,color);
+	Vector2 pos = { center.x_comp - circle_texture.width * radius/40,center.y_comp - circle_texture.height * radius/40 };
+	DrawTextureEx(circle_texture, pos, 0, (float)radius / 20.f, color); //- circle_texture.width/2,center.y_comp - circle_texture.height/2,color);
 	//For Debug Purposes
 	//DrawCircleLines(center.x_comp, center.y_comp, radius, color);
 }
