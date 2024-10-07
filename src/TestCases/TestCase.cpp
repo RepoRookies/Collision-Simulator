@@ -9,4 +9,7 @@ void TestCase::SetCurrTestCase(TestCase* test_case)
 	CollissionEngine::getCircles().clear();
 	//CollissionEngine::resizeBall();
 	curr_test_case = test_case;
+	if (test_case->IsSpacialHash() == true) {
+		CollissionEngine::InitSpacialHash();
+	}
 }

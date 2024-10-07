@@ -8,6 +8,7 @@ private:
 	static TestCase* curr_test_case;
 
 	/********* Private Variables *********/
+	bool is_spacialHash = false;
 	float restitution = .9;
 	float gravity = 5;
 	float radius = 20;
@@ -53,6 +54,12 @@ public:
 		}
 		return curr_test_case->spawn_point;
 	}
+	inline static bool IsSpacialHash() {
+		if (curr_test_case == nullptr) {
+			return false;
+		}
+		return curr_test_case->is_spacialHash;
+	}
 
 	/********* Builder Functions *********/
 	inline TestCase* SetRestitution(float restitution) {
@@ -77,6 +84,10 @@ public:
 	}
 	inline TestCase* SetRadius(float radius) {
 		this->radius = radius;
+		return this;
+	}
+	inline TestCase* SetIsSpacialHash(bool spacialHash) {
+		this->is_spacialHash = spacialHash;
 		return this;
 	}
 

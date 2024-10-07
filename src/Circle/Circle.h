@@ -14,9 +14,10 @@
 class Circle : Core::Drawable {
 private:
 	static bool texture_loaded;
+	i32 circle_id = -1;
 public:
 	static Texture2D circle_texture;
-	static float imageRescaleFactor;
+	static f32 imageRescaleFactor;
 	void init() override;
 	void update(f32 delta) override;
 	void drawGfx() override;
@@ -35,6 +36,10 @@ public:
 		double gravity = 0, 
 		Color color = GREEN
 	);
+
+	inline void setCircleId(i32 id) {
+		circle_id = id;
+	}
 
 	inline void handleGravity(int limit) {
 		gravity = (center.y_comp + radius < limit) ? TestCase::GetGravity() : 0;

@@ -12,7 +12,7 @@ int main() {
     const int window_width = 800;
     const int window_height = 600;
 
-    const float spray_wait = .25f;
+    const float spray_wait = .1f;
 	float time = 0;
 
     InitWindow(window_width, window_height, "Collision-Simulator by Team Processor Heaters");
@@ -26,11 +26,12 @@ int main() {
         ->SetRestitution(.75)
         ->SetGravity(1000)
         ->SetBallVelocity(Vec2D(0, 0))
-        ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2));
+        ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
+        ->SetIsSpacialHash(true);
 
     TestCase* test_case2
         = (new TestCase())
-        ->SetNumBalls(2)
+        ->SetNumBalls(25)
         ->SetRestitution(1.)
         ->SetGravity(0)
         ->SetBallVelocity(Vec2D(750, 540))
@@ -38,11 +39,12 @@ int main() {
 
     TestCase* test_case3
         = (new TestCase())
-        ->SetNumBalls(3)
+        ->SetNumBalls(300)
         ->SetRestitution(.9)
         ->SetGravity(1000)
         ->SetBallVelocity(Vec2D(100, 0))
-        ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2));
+        ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
+        ->SetIsSpacialHash(true);
 
 	TestCase::SetCurrTestCase(test_case1);
 
@@ -57,7 +59,7 @@ int main() {
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
-
+		//CollissionEngine::drawGrid();
 		time += GetFrameTime();
         if (CollissionEngine::getCircles().size() < TestCase::GetNumBalls() && time > spray_wait) {
 			CollissionEngine::addCircle(Circle(TestCase::GetSpawnPoint(), RADIUS, TestCase::GetBallVelocity()));
@@ -70,7 +72,10 @@ int main() {
         }
 
         //Overall Collision Handler
-		CollissionEngine::Simulate(Core::SimType::NO_HASH);
+        if(TestCase::IsSpacialHash())
+			CollissionEngine::Simulate(Core::SimType::HASH);
+        else
+			CollissionEngine::Simulate(Core::SimType::NO_HASH);
 
         DrawText(TextFormat("FPS : %d", GetFPS()), 10, 10, 20, DARKGRAY);
 
