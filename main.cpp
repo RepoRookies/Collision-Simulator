@@ -1,17 +1,17 @@
 #define RAYGUI_IMPLEMENTATION
 #pragma warning(disable : 4996)
+
 #include <raylib.h>
 #include <raygui.h>
+#include <vector>
 
 #include "src/CollissionEngine/CollissionEngine.h"
 #include "src/Circle/Circle.h"
-#include <vector>
 
 int main() {
-    // Window Dimensions
     const int window_width = 800;
     const int window_height = 600;
-
+ 
     const float spray_wait = .02f;
 	float time = 0;
 
@@ -46,8 +46,8 @@ int main() {
         ->SetBallVelocity(Vec2D(100, 0))
         ->SetRadius(8)
         ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
-        ->SetIsSpacialHash(true);
-        //->SetIsParallel(true);
+        ->SetIsSpacialHash(true)
+        ->SetIsParallel(true);
 
 	TestCase::SetCurrTestCase(test_case1);
 
@@ -55,11 +55,9 @@ int main() {
     bool showMessageBox = false;
 
     while (!WindowShouldClose()) { 
-
         if (TestCase::GetCurrTestCase() == nullptr) {
 			TestCase::SetCurrTestCase(new TestCase());
         }
-
         BeginDrawing();
         ClearBackground(RAYWHITE);
 		//CollissionEngine::drawGrid();
@@ -68,22 +66,20 @@ int main() {
 			CollissionEngine::addCircle(Circle(TestCase::GetSpawnPoint(), RADIUS, TestCase::GetBallVelocity()));
             time = 0;
         }
-
         // Draw Circles
         for (auto& circle : CollissionEngine::getCircles()) {
             circle.drawGfx();
         }
 
         //Overall Collision Handler
-        if (TestCase::IsSpacialHash())
-        {
+        if (TestCase::IsSpacialHash())         {
             if (!TestCase::IsParallel())
                 CollissionEngine::Simulate(Core::SimType::HASH);
             else
 				CollissionEngine::Simulate(Core::SimType::HASH_PARALLEL);
-        }
-        else
+        } else {
 			CollissionEngine::Simulate(Core::SimType::NO_HASH);
+        }
 
         DrawText(TextFormat("FPS : %d", GetFPS()), 10, 10, 20, DARKGRAY);
 
@@ -95,15 +91,12 @@ int main() {
         if (GuiButton(test_case_rec2, "Test 2")) TestCase::SetCurrTestCase(test_case2);
         if (GuiButton(test_case_rec3, "Test 3")) TestCase::SetCurrTestCase(test_case3);
 
-        EndDrawing(); // End Drawing
+        EndDrawing();
         for (auto& circle : CollissionEngine::getCircles()) {
             circle.update(GetFrameTime());
         }
     }
-
     CollissionEngine::unload();
-    // Close the Window and OpenGL Context
     CloseWindow();
-
     return 0;
 }

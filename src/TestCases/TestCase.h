@@ -1,8 +1,7 @@
 #pragma once
 #include "../Vector/Vector.h"
 
-class TestCase
-{
+class TestCase {
 private:
 	/********* Static Private Variables *********/
 	static TestCase* curr_test_case;
@@ -102,8 +101,6 @@ public:
 		return this;
 	}
 
-
 	/********* Static Functions *********/
 	static void SetCurrTestCase(TestCase* test_case);
 };
-

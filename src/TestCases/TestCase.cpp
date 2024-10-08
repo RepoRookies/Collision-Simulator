@@ -3,9 +3,7 @@
 
 TestCase* TestCase::curr_test_case = nullptr;
 
-
-void TestCase::SetCurrTestCase(TestCase* test_case)
-{
+void TestCase::SetCurrTestCase(TestCase* test_case) {
 	CollissionEngine::getCircles().clear();
 	//CollissionEngine::resizeBall();
 	curr_test_case = test_case;

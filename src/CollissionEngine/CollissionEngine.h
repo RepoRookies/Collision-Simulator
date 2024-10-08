@@ -6,7 +6,6 @@
 #define MAX_COLLIDERS_PER_CELL 100
 #define NUM_THREADS 4
 
-
 /**
 * Collission Engine Class
 * Collission Engine does not create or destroy collider
@@ -39,12 +38,10 @@ private:
 	static void SolveCollissionsHashParallel();
 	static void SolveCollissionsForCellHash(i32 x, i32 y);
 	static inline Vec2D GetColIndicesFloor(Vec2D col_pos) {
-		return  Vec2D(floor(col_pos.x_comp / (2*RADIUS)),
-			floor(col_pos.y_comp / (2*RADIUS)));
+		return  Vec2D(floor(col_pos.x_comp / (2*RADIUS)), floor(col_pos.y_comp / (2*RADIUS)));
 	}
 	static inline Vec2D GetColIndicesCeil(Vec2D col_pos) {
-		return  Vec2D(ceil(col_pos.x_comp / (2*RADIUS)),
-			ceil(col_pos.y_comp / (2*RADIUS)));
+		return  Vec2D(ceil(col_pos.x_comp / (2*RADIUS)), ceil(col_pos.y_comp / (2*RADIUS)));
 	}
 
 public:
@@ -77,6 +74,5 @@ public:
 	static inline std::vector<Circle>& getCircles() {
 		return circles;
 	}
-
 	static void drawGrid();
 };
