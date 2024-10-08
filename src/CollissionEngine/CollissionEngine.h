@@ -4,6 +4,7 @@
 
 #define COLLISION_CLOCK_RATE 8
 #define MAX_COLLIDERS_PER_CELL 100
+#define NUM_THREADS 4
 
 
 /**

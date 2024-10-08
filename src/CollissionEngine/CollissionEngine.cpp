@@ -22,6 +22,8 @@ void CollissionEngine::load() {
 }
 
 void CollissionEngine::InitSpacialHash() {
+	omp_set_num_threads(NUM_THREADS == 0 ? omp_get_num_procs(): NUM_THREADS);
+
 	//Spatial Hash Initialization
 	cellsX = GetScreenWidth() / (2*RADIUS);
 	cellsY = GetScreenHeight() / (2*RADIUS);
@@ -77,7 +79,6 @@ void CollissionEngine::GenerateSpatialGrid()
 		Vec2D circle_size= Vec2D(circle.radius, circle.radius);
 		Vec2D neg_circle_size= Vec2D(-circle_size.x_comp, -circle_size.y_comp);
 
-
 		// NOTE: Bharath: This method isn't perfect at all, and I don't have any great Ideas, But having most colliders
 		//                Less than GRID_CELL_SIZE will be really good for performance unless GRID_CELL_SIZE is too big
 		Vec2D col_size_indices_start = GetColIndicesFloor(neg_circle_size);
@@ -130,7 +131,7 @@ void CollissionEngine::SolveCollissionsHashParallel()
 {
 	if (!is_initialized)
 		return;
-#pragma omp parallel for collapse(2) 
+	#pragma omp parallel for collapse(2) schedule(static, cellsY) shared(colliders_per_cell, num_colliders_per_cell)
 	for (i32 x = 0; x < cellsX; x++) {
 		for (i32 y = 0; y < cellsY; y++) {
 			SolveCollissionsForCellHash(x, y);

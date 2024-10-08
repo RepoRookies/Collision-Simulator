@@ -104,7 +104,6 @@ void Circle::handleWindowBounds() {
 // Overall Collision Handler Implementation
 void Circle::handleCollision(Circle& first, Circle& second) {
 	bool collision = Circle::isCollision(first, second);
-	first.color = second.color = collision ? RED : GREEN;
 
 	if (collision) {
 		first.handleWindowBounds();

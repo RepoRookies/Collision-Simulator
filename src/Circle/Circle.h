@@ -34,7 +34,7 @@ public:
 		double radius = RADIUS,
 		Vec2D velocity = Vec2D(0, 0),
 		double gravity = 0, 
-		Color color = GREEN
+		Color color = RED
 	);
 
 	inline void setCircleId(i32 id) {

@@ -40,14 +40,14 @@ int main() {
 
     TestCase* test_case3
         = (new TestCase())
-        ->SetNumBalls(1000)
+        ->SetNumBalls(1500)
         ->SetRestitution(.9)
         ->SetGravity(1000)
         ->SetBallVelocity(Vec2D(100, 0))
-        ->SetRadius(10)
+        ->SetRadius(8)
         ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
-        ->SetIsSpacialHash(true)
-        ->SetIsParallel(true);
+        ->SetIsSpacialHash(true);
+        //->SetIsParallel(true);
 
 	TestCase::SetCurrTestCase(test_case1);
 
