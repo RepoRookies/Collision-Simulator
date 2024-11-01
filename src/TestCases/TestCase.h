@@ -9,6 +9,7 @@ private:
 	/********* Private Variables *********/
 	bool is_spacialHash = false;
 	bool is_parallel = false;
+	bool is_mpi = false;
 	float restitution = .9;
 	float gravity = 5;
 	float radius = 20;
@@ -66,6 +67,12 @@ public:
 		}
 		return curr_test_case->is_parallel;
 	}
+	inline static bool IsMPI() {
+		if (curr_test_case == nullptr) {
+			return false;
+		}
+		return curr_test_case->is_mpi;
+	}
 
 	/********* Builder Functions *********/
 	inline TestCase* SetRestitution(float restitution) {
@@ -98,6 +105,10 @@ public:
 	}
 	inline TestCase* SetIsParallel(bool parallel) {
 		this->is_parallel = parallel;
+		return this;
+	}
+	inline TestCase* SetIsMPI(bool mpi) {
+		this->is_mpi = mpi;
 		return this;
 	}
 

@@ -109,6 +109,15 @@ void CollissionEngine::simulate_hash_parallel() {
 	}
 }
 
+
+void CollissionEngine::simulate_hash_parallel_mpi(int process_rank) {
+
+	for (size_t i = 0; i < COLLISION_CLOCK_RATE; i++) {
+		GenerateSpatialGrid();
+		SolveCollissionsHashParallelMPI(process_rank);
+	}
+}
+
 void CollissionEngine::SolveCollissionsHash() {
 	if (!is_initialized)
 		return;
@@ -120,6 +129,17 @@ void CollissionEngine::SolveCollissionsHash() {
 }
 
 void CollissionEngine::SolveCollissionsHashParallel() {
+	if (!is_initialized)
+		return;
+	#pragma omp parallel for collapse(2) schedule(static, cellsY) shared(colliders_per_cell, num_colliders_per_cell)
+	for (i32 x = 0; x < cellsX; x++) {
+		for (i32 y = 0; y < cellsY; y++) {
+			SolveCollissionsForCellHash(x, y);
+		}
+	}
+}
+
+void CollissionEngine::SolveCollissionsHashParallelMPI(int process_rank) {
 	if (!is_initialized)
 		return;
 	#pragma omp parallel for collapse(2) schedule(static, cellsY) shared(colliders_per_cell, num_colliders_per_cell)

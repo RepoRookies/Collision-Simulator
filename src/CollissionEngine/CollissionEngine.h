@@ -15,7 +15,8 @@ namespace Core {
 	enum class SimType {
 		NO_HASH,
 		HASH,
-		HASH_PARALLEL
+		HASH_PARALLEL,
+		HASH_PARALLEL_MPI
 	};
 }
 
@@ -36,6 +37,8 @@ private:
 	static std::vector<std::vector<i32>> num_colliders_per_cell;
 	static void SolveCollissionsHash();
 	static void SolveCollissionsHashParallel();
+	static void SolveCollissionsHashParallelMPI(int process_rank);
+	static void simulate_hash_parallel_mpi(int process_rank);
 	static void SolveCollissionsForCellHash(i32 x, i32 y);
 	static inline Vec2D GetColIndicesFloor(Vec2D col_pos) {
 		return  Vec2D(floor(col_pos.x_comp / (2*RADIUS)), floor(col_pos.y_comp / (2*RADIUS)));
@@ -49,7 +52,7 @@ public:
 	static void InitSpacialHash();
 	static void resizeBall();
 	static void unload();
-	inline static void Simulate(Core::SimType sim_type) {
+	inline static void Simulate(Core::SimType sim_type,int process_rank) {
 		if (!is_initialized)
 			return;
 		switch (sim_type) {
@@ -62,7 +65,11 @@ public:
 			} case Core::SimType::HASH_PARALLEL: {
 				simulate_hash_parallel();
 				return;
+			} case Core::SimType::HASH_PARALLEL_MPI: {
+				simulate_hash_parallel_mpi(process_rank);
+				return;
 			}
+
 		}
 	}
 
