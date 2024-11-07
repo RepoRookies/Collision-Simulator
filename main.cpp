@@ -10,67 +10,120 @@
 #include "src/Circle/Circle.h"
 
 int main(int argc, char** argv) {
-    int process_rank, size_Of_Cluster;
+    int rank, size;
+
+    std::vector<i32> gridIds, localGridIds;
+    i32 nofGrids, localNofGrids;
 
     MPI_Init(&argc, &argv);
-	MPI_Comm_size(MPI_COMM_WORLD, &size_Of_Cluster);
-	MPI_Comm_rank(MPI_COMM_WORLD, &process_rank);
-    if (process_rank == 0) {
-        printf("Number of processes: %d\n", size_Of_Cluster);
-        const int window_width = 800;
-        const int window_height = 600;
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-        const float spray_wait = .02f;
-        float time = 0;
+    const int window_width = 800;
+    const int window_height = 600;
 
+    const float spray_wait = .02f;
+    float time = 0;
+
+    /* ************** * Test Cases * ************** */
+
+    TestCase* test_case1
+        = (new TestCase())
+        ->SetNumBalls(1)
+        ->SetRestitution(.75)
+        ->SetGravity(1000)
+        ->SetBallVelocity(Vec2D(0, 0))
+        ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
+        ->SetRadius(40)
+        ->SetIsSpacialHash(true);
+
+    TestCase* test_case2
+        = (new TestCase())
+        ->SetNumBalls(25)
+        ->SetRestitution(1.)
+        ->SetGravity(0)
+        ->SetBallVelocity(Vec2D(750, 540))
+        ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
+        ->SetIsMPI(true);
+
+    TestCase* test_case3
+        = (new TestCase())
+        ->SetNumBalls(1500)
+        ->SetRestitution(.9)
+        ->SetGravity(1000)
+        ->SetBallVelocity(Vec2D(100, 0))
+        ->SetRadius(8)
+        ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
+        ->SetIsSpacialHash(true)
+        ->SetIsParallel(true);
+
+    TestCase* test_case4
+        = (new TestCase())
+        ->SetNumBalls(1500)
+        ->SetRestitution(.9)
+        ->SetGravity(1000)
+        ->SetBallVelocity(Vec2D(100, 0))
+        ->SetRadius(8)
+        ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
+        ->SetIsSpacialHash(true)
+        ->SetIsParallel(true)
+        ->SetIsMPI(true);
+
+    TestCase::SetCurrTestCase(test_case3);
+       
+    if (rank == 0) {
         InitWindow(window_width, window_height, "Collision-Simulator by Team Processor Heaters");
         CollissionEngine::load();
 
-        /* ************** * Test Cases * ************** */
+        nofGrids = CollissionEngine::getNumGrids();
+    }
 
-        TestCase* test_case1
-            = (new TestCase())
-            ->SetNumBalls(1)
-            ->SetRestitution(.75)
-            ->SetGravity(1000)
-            ->SetBallVelocity(Vec2D(0, 0))
-            ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
-            ->SetRadius(40)
-            ->SetIsSpacialHash(true);
+    MPI_Bcast(&nofGrids, 1, MPI_INT, MPI_ROOT, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
 
-        TestCase* test_case2
-            = (new TestCase())
-            ->SetNumBalls(25)
-            ->SetRestitution(1.)
-            ->SetGravity(0)
-            ->SetBallVelocity(Vec2D(750, 540))
-            ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2));
+    localNofGrids = nofGrids / size;
 
-        TestCase* test_case3
-            = (new TestCase())
-            ->SetNumBalls(1500)
-            ->SetRestitution(.9)
-            ->SetGravity(1000)
-            ->SetBallVelocity(Vec2D(100, 0))
-            ->SetRadius(8)
-            ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
-            ->SetIsSpacialHash(true)
-            ->SetIsParallel(true)
-			->SetIsMPI(false);
+    for (size_t i = 0; i < nofGrids; i++) {
+        gridIds.push_back(storeCircleId(i, nofGrids));
+    }
 
-        TestCase* test_case4
-            = (new TestCase())
-            ->SetNumBalls(1500)
-            ->SetRestitution(.9)
-            ->SetGravity(1000)
-            ->SetBallVelocity(Vec2D(100, 0))
-            ->SetRadius(8)
-            ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
-            ->SetIsSpacialHash(true)
-            ->SetIsParallel(true)
-			->SetIsMPI(true);
+    localGridIds.resize(localNofGrids);
 
-        TestCase::SetCurrTestCase(test_case1);
+    MPI_Scatter(
+        gridIds.data(),
+        localNofGrids,
+        MPI_INT,
+        localGridIds.data(),
+        localNofGrids,
+        MPI_INT,
+        MPI_ROOT,
+        MPI_COMM_WORLD
+    );
+
+    std::cout << "Process: " << rank << " -> [" << localNofGrids << "]: ";
+    for (auto id : localGridIds) {
+        std::cout << id << " ";
+    }
+    std::cout << "\n" << std::endl;
+
+    MPI_Gather(
+        localGridIds.data(),
+        localNofGrids,
+        MPI_INT,
+        gridIds.data(),
+        localNofGrids,
+        MPI_INT,
+        MPI_ROOT,
+        MPI_COMM_WORLD
+    );
+ 
+    if (rank == 0) {
+
+        std::cout << "Process: " << rank << " collected Grid Data: ";
+        for (auto id : gridIds) {
+            std::cout << id << " ";
+        }
+        std::cout << "\n" << std::endl;
 
         SetTargetFPS(120);
         bool showMessageBox = false;
@@ -79,8 +132,10 @@ int main(int argc, char** argv) {
             if (TestCase::GetCurrTestCase() == nullptr) {
                 TestCase::SetCurrTestCase(new TestCase());
             }
+
             BeginDrawing();
             ClearBackground(RAYWHITE);
+
             //CollissionEngine::drawGrid();
             time += GetFrameTime();
             if (CollissionEngine::getCircles().size() < TestCase::GetNumBalls() && time > spray_wait) {
@@ -95,14 +150,14 @@ int main(int argc, char** argv) {
             //Overall Collision Handler
             if (TestCase::IsSpacialHash()) {
                 if (!TestCase::IsParallel())
-                    CollissionEngine::Simulate(Core::SimType::HASH,process_rank);
+                    CollissionEngine::Simulate(Core::SimType::HASH,size,rank);
 				else if (!TestCase::IsMPI())
-                    CollissionEngine::Simulate(Core::SimType::HASH_PARALLEL,process_rank);
+                    CollissionEngine::Simulate(Core::SimType::HASH_PARALLEL,size,rank);
                 else
-					CollissionEngine::Simulate(Core::SimType::HASH_PARALLEL_MPI,process_rank);
+					CollissionEngine::Simulate(Core::SimType::HASH_PARALLEL_MPI,size,rank);
             }
             else {
-                CollissionEngine::Simulate(Core::SimType::NO_HASH,process_rank);
+                CollissionEngine::Simulate(Core::SimType::NO_HASH,size,rank);
             }
 
             DrawText(TextFormat("FPS : %d", GetFPS()), 10, 10, 20, DARKGRAY);
@@ -122,6 +177,9 @@ int main(int argc, char** argv) {
         }
         CollissionEngine::unload();
         CloseWindow();
+    }
+    else {
+        CollissionEngine::Simulate(Core::SimType::HASH_PARALLEL_MPI, size, rank);
     }
 
     MPI_Finalize();

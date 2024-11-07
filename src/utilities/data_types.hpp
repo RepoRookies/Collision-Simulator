@@ -8,6 +8,9 @@
 #define DOT *
 #define CROSS &
 
+#define MPI_PROC_SET(x) x
+#define storeCircleId(x, lim) (x % lim)
+
 typedef float f32;
 typedef double f64;
 

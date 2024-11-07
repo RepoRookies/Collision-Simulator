@@ -1,10 +1,13 @@
 #pragma once
+#include <iostream>
 #include <vector>
+#include <mpi.h>
 #include "../Circle/Circle.h"
 
 #define COLLISION_CLOCK_RATE 8
 #define MAX_COLLIDERS_PER_CELL 100
-#define NUM_THREADS 4
+#define MPI_ROOT 0
+
 
 /**
 * Collission Engine Class
@@ -31,6 +34,7 @@ private:
 	static void simulate_no_hash();
 	static void simulate_hash();
 	static void simulate_hash_parallel();
+	static void simulate_hash_parallel_mpi(int cluster_size, int process_rank);
 
 	/******** Spatial Hashing Specific ********/
 	static std::vector<std::vector<std::vector<i32>>> colliders_per_cell;
@@ -38,7 +42,6 @@ private:
 	static void SolveCollissionsHash();
 	static void SolveCollissionsHashParallel();
 	static void SolveCollissionsHashParallelMPI(int process_rank);
-	static void simulate_hash_parallel_mpi(int process_rank);
 	static void SolveCollissionsForCellHash(i32 x, i32 y);
 	static inline Vec2D GetColIndicesFloor(Vec2D col_pos) {
 		return  Vec2D(floor(col_pos.x_comp / (2*RADIUS)), floor(col_pos.y_comp / (2*RADIUS)));
@@ -52,7 +55,12 @@ public:
 	static void InitSpacialHash();
 	static void resizeBall();
 	static void unload();
-	inline static void Simulate(Core::SimType sim_type,int process_rank) {
+
+	inline static i32 getNumGrids() {
+		TraceLog(LOG_INFO, "%d %d \n", cellsX, cellsY);
+		return cellsX * cellsY;
+	}
+	inline static void Simulate(Core::SimType sim_type, int cluster_size, int process_rank) {
 		if (!is_initialized)
 			return;
 		switch (sim_type) {
@@ -66,7 +74,7 @@ public:
 				simulate_hash_parallel();
 				return;
 			} case Core::SimType::HASH_PARALLEL_MPI: {
-				simulate_hash_parallel_mpi(process_rank);
+				simulate_hash_parallel_mpi(cluster_size, process_rank);
 				return;
 			}
 

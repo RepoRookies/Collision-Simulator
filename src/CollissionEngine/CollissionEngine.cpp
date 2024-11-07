@@ -1,12 +1,12 @@
-#include <omp.h>
 #include "CollissionEngine.h"
 #include "../TestCases/TestCase.h"
+#include "../utilities/data_types.hpp"
 
 std::vector <Circle> CollissionEngine::circles;
 std::vector <std::vector <std::vector<i32>>> CollissionEngine::colliders_per_cell;
 std::vector <std::vector <i32>> CollissionEngine::num_colliders_per_cell;
-i32 CollissionEngine::cellsX = 0;
-i32 CollissionEngine::cellsY = 0;
+i32 CollissionEngine::cellsX = 20;
+i32 CollissionEngine::cellsY = 15;
 bool CollissionEngine::is_initialized = false;
 
 void CollissionEngine::load() {
@@ -22,7 +22,6 @@ void CollissionEngine::load() {
 }
 
 void CollissionEngine::InitSpacialHash() {
-	omp_set_num_threads(NUM_THREADS == 0 ? omp_get_num_procs(): NUM_THREADS);
 
 	cellsX = GetScreenWidth() / (2 * RADIUS);
 	cellsY = GetScreenHeight() / (2 * RADIUS);
@@ -110,11 +109,12 @@ void CollissionEngine::simulate_hash_parallel() {
 }
 
 
-void CollissionEngine::simulate_hash_parallel_mpi(int process_rank) {
-
-	for (size_t i = 0; i < COLLISION_CLOCK_RATE; i++) {
-		GenerateSpatialGrid();
-		SolveCollissionsHashParallelMPI(process_rank);
+void CollissionEngine::simulate_hash_parallel_mpi(i32 cluster_size, i32 process_rank) {
+	if (process_rank == (MPI_PROC_SET(MPI_PROC_NULL & 0))) {
+		for (size_t i = 0; i < COLLISION_CLOCK_RATE; i++) {
+			GenerateSpatialGrid();
+			SolveCollissionsHashParallelMPI(process_rank);
+		}
 	}
 }
 
@@ -131,7 +131,6 @@ void CollissionEngine::SolveCollissionsHash() {
 void CollissionEngine::SolveCollissionsHashParallel() {
 	if (!is_initialized)
 		return;
-	#pragma omp parallel for collapse(2) schedule(static, cellsY) shared(colliders_per_cell, num_colliders_per_cell)
 	for (i32 x = 0; x < cellsX; x++) {
 		for (i32 y = 0; y < cellsY; y++) {
 			SolveCollissionsForCellHash(x, y);
@@ -139,10 +138,10 @@ void CollissionEngine::SolveCollissionsHashParallel() {
 	}
 }
 
-void CollissionEngine::SolveCollissionsHashParallelMPI(int process_rank) {
+void CollissionEngine::SolveCollissionsHashParallelMPI(i32 process_rank) {
 	if (!is_initialized)
 		return;
-	#pragma omp parallel for collapse(2) schedule(static, cellsY) shared(colliders_per_cell, num_colliders_per_cell)
+
 	for (i32 x = 0; x < cellsX; x++) {
 		for (i32 y = 0; y < cellsY; y++) {
 			SolveCollissionsForCellHash(x, y);
