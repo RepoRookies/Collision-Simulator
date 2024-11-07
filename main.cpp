@@ -25,6 +25,11 @@ int main(int argc, char** argv) {
     const float spray_wait = .02f;
     float time = 0;
 
+    if (rank == 0) {
+        InitWindow(window_width, window_height, "Collision-Simulator by Team Processor Heaters");
+        CollissionEngine::load();
+    }
+
     /* ************** * Test Cases * ************** */
 
     TestCase* test_case1
@@ -35,7 +40,8 @@ int main(int argc, char** argv) {
         ->SetBallVelocity(Vec2D(0, 0))
         ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
         ->SetRadius(40)
-        ->SetIsSpacialHash(true);
+        ->SetIsSpacialHash(true)
+        ->SetIsMPI(true);
 
     TestCase* test_case2
         = (new TestCase())
@@ -55,40 +61,21 @@ int main(int argc, char** argv) {
         ->SetRadius(8)
         ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
         ->SetIsSpacialHash(true)
-        ->SetIsParallel(true);
-
-    TestCase* test_case4
-        = (new TestCase())
-        ->SetNumBalls(1500)
-        ->SetRestitution(.9)
-        ->SetGravity(1000)
-        ->SetBallVelocity(Vec2D(100, 0))
-        ->SetRadius(8)
-        ->SetSpawnPoint(Vec2D(window_width / 2, window_height / 2))
-        ->SetIsSpacialHash(true)
         ->SetIsParallel(true)
         ->SetIsMPI(true);
 
-    TestCase::SetCurrTestCase(test_case3);
+    TestCase::SetCurrTestCase(test_case1);
        
     if (rank == 0) {
-        InitWindow(window_width, window_height, "Collision-Simulator by Team Processor Heaters");
-        CollissionEngine::load();
-
         nofGrids = CollissionEngine::getNumGrids();
     }
-
     MPI_Bcast(&nofGrids, 1, MPI_INT, MPI_ROOT, MPI_COMM_WORLD);
-    MPI_Barrier(MPI_COMM_WORLD);
-
     localNofGrids = nofGrids / size;
-
     for (size_t i = 0; i < nofGrids; i++) {
         gridIds.push_back(storeCircleId(i, nofGrids));
     }
 
     localGridIds.resize(localNofGrids);
-
     MPI_Scatter(
         gridIds.data(),
         localNofGrids,
@@ -118,7 +105,6 @@ int main(int argc, char** argv) {
     );
  
     if (rank == 0) {
-
         std::cout << "Process: " << rank << " collected Grid Data: ";
         for (auto id : gridIds) {
             std::cout << id << " ";
@@ -129,10 +115,10 @@ int main(int argc, char** argv) {
         bool showMessageBox = false;
 
         while (!WindowShouldClose()) {
+
             if (TestCase::GetCurrTestCase() == nullptr) {
                 TestCase::SetCurrTestCase(new TestCase());
             }
-
             BeginDrawing();
             ClearBackground(RAYWHITE);
 

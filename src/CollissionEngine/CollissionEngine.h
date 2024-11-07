@@ -57,7 +57,6 @@ public:
 	static void unload();
 
 	inline static i32 getNumGrids() {
-		TraceLog(LOG_INFO, "%d %d \n", cellsX, cellsY);
 		return cellsX * cellsY;
 	}
 	inline static void Simulate(Core::SimType sim_type, int cluster_size, int process_rank) {
